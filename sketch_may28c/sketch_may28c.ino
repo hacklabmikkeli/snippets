@@ -1,3 +1,6 @@
+const int DETECT_DIST = 100;
+const int TRIG_TIMEOUT = 3000;
+
 const int TRIG_1 = 2;
 const int ECHO_1 = 3;
 const int TRIG_2 = 4;
@@ -16,29 +19,47 @@ void setup() {
 }
 
 void loop() {
-  int delay1;
-  int delay2;
+  
+  unsigned long currentMillis = millis();
+  
+  int dist1;
+  int dist2;
   digitalWrite(TRIG_1, LOW);
   delayMicroseconds(2);
   digitalWrite(TRIG_1, HIGH);
-  delayMicroseconds(20);
+  delayMicroseconds(10);
   digitalWrite(TRIG_1, LOW);
   
-  delay1 = pulseIn(ECHO_1, HIGH);
+  dist1 = pulseIn(ECHO_1, HIGH) / 58.2;
   
   digitalWrite(TRIG_2, LOW);
   delayMicroseconds(2);
   digitalWrite(TRIG_2, HIGH);
-  delayMicroseconds(20);
+  delayMicroseconds(10);
   digitalWrite(TRIG_2, LOW);
   
-  delay2 = pulseIn(ECHO_2, HIGH);
+  dist2 = pulseIn(ECHO_2, HIGH) / 58.2;
   
-  if (delay1 > 800 && delay2 > 800) {
-    Serial.println("Away");
-  } else if (delay1 < delay2) {
-    Serial.println("Near delay 1");
-  } else {
-    Serial.println("Near delay 2");
+  if(dist1 > DETECT_DIST && dist2 > DETECT_DIST && lastProbe > -1){
+    lastProbe = -1;
+    directionFound = false;
+  }
+  
+  if (dist1 < DETECT_DIST) {
+    if(lastProbe < 0){
+      lastProbe = 0;
+      echo1Activated = 
+    }else if(lastProbe == 1){
+      Serial.println("Left");
+      directionFound = true;
+    }
   } 
+  if(dist2 < DETECT_DIST) {
+    if(lastProbe < 0){
+      lastProbe = 1;
+    }else if(lastProbe == 0){
+      Serial.println("Right");
+      directionFound = true;
+    }
+  }
 }
